@@ -33,10 +33,17 @@ export default async function userSignInController(req, res) {
             const token = await jwt.sign(tokenData, process.env.TOKEN_SECRET_KEY, { expiresIn: '8h' });
 
             // Set cookie options
+            // const tokenOption = {
+            //     httpOnly: true,
+            //     secure: true,
+            // };
+
             const tokenOption = {
-                httpOnly: true,
-                secure: true,
-            };
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 8 * 60 * 60 * 1000 // 8 hours
+    };
 
             // Set the cookie and send the response
             res.cookie("token", token, tokenOption).status(200).json({
